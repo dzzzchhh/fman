@@ -29,6 +29,10 @@ type Entry struct {
 	SymLinkPath string
 }
 
+func (e Entry) IsSymLink() bool {
+	return e.SymlinkName != ""
+}
+
 type EntryMsg struct {
 	Entry Entry
 }

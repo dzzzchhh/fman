@@ -80,6 +80,19 @@ func truncateText(str string, max int) string {
 	return _str
 }
 
+const DIR_ICON = "📁"
+const FILE_ICON = "📄"
+const LINK_ICON = "🔗"
+
+func assignListItemIcon(entry entry.Entry) string {
+	if entry.IsSymLink() {
+		return LINK_ICON
+	} else if entry.IsDir {
+		return DIR_ICON
+	}
+	return FILE_ICON
+}
+
 func detectOpenCommand() string {
 	switch runtime.GOOS {
 	case "linux":
@@ -358,15 +371,10 @@ func (list ListModel) View() string {
 		entry := list.entries[index]
 		content := make([]strings.Builder, cellsLength)
 
-		name := truncateText(entry.Name, list.truncateLimit)
+		name := assignListItemIcon(entry) + " " + truncateText(entry.Name, list.truncateLimit)
 
-		if entry.SymlinkName != "" {
-			content[0].WriteByte('@')
-			content[0].WriteString(strings.ReplaceAll(entry.SymlinkName, "-", "_"))
-
-		} else {
-			content[0].WriteString(strings.ReplaceAll(name, "-", "_")) // FIXME: Temporary Solution
-		}
+		// TODO: also see https://github.com/nore-dev/fman/issues/2
+		content[0].WriteString(name)
 		content[1].WriteString(entry.Size)
 		content[2].WriteString(entry.ModifyTime)
 
